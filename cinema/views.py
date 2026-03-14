@@ -1,7 +1,5 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.filters import SearchFilter
-from rest_framework.pagination import PageNumberPagination
 
 from cinema.models import (
     Genre,
@@ -44,8 +42,6 @@ class CinemaHallViewSet(viewsets.ModelViewSet):
 class MovieViewSet(viewsets.ModelViewSet):
     queryset = Movie.objects.all().order_by("id")
     serializer_class = MovieSerializer
-    filter_backends = [SearchFilter]
-    search_fields = ["title"]
 
     def get_queryset(self):
         queryset = Movie.objects.prefetch_related("genres", "actors")
@@ -84,7 +80,6 @@ class MovieViewSet(viewsets.ModelViewSet):
 class MovieSessionViewSet(viewsets.ModelViewSet):
     queryset = MovieSession.objects.all().order_by("id")
     serializer_class = MovieSessionSerializer
-    filter_backends = []
 
     def get_queryset(self):
         queryset = (
@@ -118,16 +113,9 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         return MovieSessionSerializer
 
 
-class OrderPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = "page_size"
-    max_page_size = 50
-
-
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().order_by("-created_at")
     permission_classes = [IsAuthenticated]
-    pagination_class = OrderPagination
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -147,3 +135,4 @@ class OrderViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
+
