@@ -44,7 +44,7 @@ class MovieListSerializer(MovieSerializer):
     genres = serializers.SlugRelatedField(
         many=True,
         read_only=True,
-        slug_field="name"
+        slug_field="name",
     )
     actors = serializers.SerializerMethodField()
 
@@ -72,9 +72,18 @@ class MovieSessionSerializer(serializers.ModelSerializer):
 
 
 class MovieSessionListSerializer(serializers.ModelSerializer):
-    movie_title = serializers.CharField(source="movie.title", read_only=True)
-    cinema_hall_name = serializers.CharField(source="cinema_hall.name", read_only=True)
-    cinema_hall_capacity = serializers.IntegerField(source="cinema_hall.capacity", read_only=True)
+    movie_title = serializers.CharField(
+        source="movie.title",
+        read_only=True,
+    )
+    cinema_hall_name = serializers.CharField(
+        source="cinema_hall.name",
+        read_only=True,
+    )
+    cinema_hall_capacity = serializers.IntegerField(
+        source="cinema_hall.capacity",
+        read_only=True,
+    )
     tickets_available = serializers.SerializerMethodField()
 
     class Meta:
@@ -102,7 +111,10 @@ class MovieSessionDetailSerializer(serializers.ModelSerializer):
         fields = ("id", "show_time", "movie", "cinema_hall", "taken_places")
 
     def get_taken_places(self, obj: MovieSession) -> list[dict]:
-        return [{"row": ticket.row, "seat": ticket.seat} for ticket in obj.tickets.all()]
+        return [
+            {"row": ticket.row, "seat": ticket.seat}
+            for ticket in obj.tickets.all()
+        ]
 
 
 class TicketSerializer(serializers.ModelSerializer):
@@ -141,4 +153,3 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         for ticket_data in tickets_data:
             Ticket.objects.create(order=order, **ticket_data)
         return order
-
