@@ -93,7 +93,7 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
             .prefetch_related(
                 "movie__genres",
                 "movie__actors",
-                "tickets"
+                "tickets",
             )
         )
 
@@ -118,9 +118,8 @@ class MovieSessionViewSet(viewsets.ModelViewSet):
         return MovieSessionSerializer
 
 
-# --- Pagination class for Orders ---
 class OrderPagination(PageNumberPagination):
-    page_size = 10  # Можеш змінити на будь-яке число
+    page_size = 10
     page_size_query_param = "page_size"
     max_page_size = 50
 
@@ -128,17 +127,17 @@ class OrderPagination(PageNumberPagination):
 class OrderViewSet(viewsets.ModelViewSet):
     queryset = Order.objects.all().order_by("-created_at")
     permission_classes = [IsAuthenticated]
-    pagination_class = OrderPagination  # <-- додаємо пагінацію
+    pagination_class = OrderPagination
 
     def get_queryset(self):
         qs = super().get_queryset()
         return (
             qs.filter(user=self.request.user)
-              .prefetch_related(
-                  "tickets__movie_session__movie",
-                  "tickets__movie_session__cinema_hall",
-              )
-              .order_by("-created_at")
+            .prefetch_related(
+                "tickets__movie_session__movie",
+                "tickets__movie_session__cinema_hall",
+            )
+            .order_by("-created_at")
         )
 
     def get_serializer_class(self):
